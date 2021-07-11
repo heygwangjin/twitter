@@ -1,0 +1,31 @@
+# Numerous always-ignore extensions
+*.bak
+*.patch
+*.diff
+*.err
+*.orig
+*.log
+*.rej
+*.swo
+*.swp
+*.zip
+*.vi
+*~
+*.sass-cache
+package-lock.json
+
+# npm package
+*.tgz
+
+# OS or Editor folders
+.DS_Store
+._*
+.cache
+.project
+.settings
+.tmproj
+*.esproj
+*.sublime-project
+nbproject
+thumbs.db
+*.*-workspace

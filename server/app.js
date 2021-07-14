@@ -7,11 +7,12 @@ import tweetRouter from "./router/tweet.js";
 
 const app = express();
 
-app.use(express.json());
+app.use(express.json()); // req.body 파싱
 app.use(helmet());
 app.use(cors());
-app.use(morgan("tiny"));
+app.use(morgan("short"));
 
+// Router
 app.use("/tweets", tweetRouter);
 
 // Not Found

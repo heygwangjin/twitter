@@ -52,5 +52,5 @@ export async function update(id, text) {
 }
 
 export async function remove(id) {
-  tweets = tweets.filter((t) => t.id !== id); // id에 맞는 요소만 삭제하고 나머지 요소들로 filtering된 배열 생성해서 대입
+  tweets = tweets.filter((t) => t.id !== id); // id에 맞는 요소를 제외한 나머지 요소들로 filtering된 새로운 배열 생성
 }

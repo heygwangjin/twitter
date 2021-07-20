@@ -1,56 +1,68 @@
 //* Model (DATA)
 //* Only Store, Read and Write Data (Controller의 요청에 따라)
+import * as userRepository from "./auth.js";
+
 let tweets = [
   {
     id: "1",
     text: "드림코딩에서 강의 들으면 너무 좋으다",
-    createdAt: "2021-05-09T04:20:57.000Z",
-    name: "Bob",
-    username: "bob",
-    url: "https://widgetwhats.com/app/uploads/2019/11/free-profile-photo-whatsapp-1.png",
+    createdAt: new Date().toString(),
+    userId: "1",
   },
   {
     id: "2",
     text: "HI!",
-    createdAt: Date.now().toString(),
-    name: "Ellie",
-    username: "ellie",
+    createdAt: new Date().toString(),
+    userId: "1",
   },
 ];
 
 export async function getAll() {
-  return tweets;
+  return Promise.all(
+    tweets.map(async (tweet) => {
+      const { username, name, url } = await userRepository.findById(
+        tweet.userId
+      );
+      return { ...tweet, username, name, url };
+    })
+  );
 }
 
 export async function getAllByUsername(username) {
-  return tweets.filter((t) => t.username === username);
+  return getAll().then((tweets) =>
+    tweets.filter((tweet) => tweet.username === username)
+  );
 }
 
 export async function getById(id) {
-  return tweets.find((t) => t.id === id);
+  const found = tweets.find((tweet) => tweet.id === id);
+  if (!found) {
+    return null;
+  }
+  const { username, name, url } = await userRepository.findById(found.userId);
+  return { ...found, username, name, url };
 }
 
-export async function create(text, name, username) {
+export async function create(text, userId) {
   const tweet = {
     id: Date.now().toString(),
     text,
     createAt: new Date(),
-    name,
-    username,
+    userId,
   };
   tweets = [tweet, ...tweets];
-  return tweet;
+  return getById(tweet.id);
 }
 
 export async function update(id, text) {
-  const tweet = tweets.find((t) => t.id === id);
+  const tweet = tweets.find((tweet) => tweet.id === id);
   // tweet 이 undefined 인 경우 고려
   if (tweet) {
     tweet.text = text;
   }
-  return tweet;
+  return getById(tweet.id);
 }
 
 export async function remove(id) {
-  tweets = tweets.filter((t) => t.id !== id); // id에 맞는 요소를 제외한 나머지 요소들로 filtering된 새로운 배열 생성
+  tweets = tweets.filter((tweet) => tweet.id !== id); // id에 맞는 요소를 제외한 나머지 요소들로 filtering된 새로운 배열 생성
 }

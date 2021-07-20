@@ -2,6 +2,7 @@ import express from "express";
 import "express-async-errors";
 import { body } from "express-validator";
 import * as tweetController from "../controller/tweet.js";
+import { isAuth } from "../middleware/auth.js";
 import { validate } from "../middleware/validator.js";
 
 const router = express.Router();
@@ -20,18 +21,18 @@ const validateTweet = [
 // TODO: GET /tweets
 // TODO: GET /tweets?username=:username
 //* 함수를 호출하면 값이 return 되기 때문에, 반드시 함수를 연결해야 한다.
-router.get("/", tweetController.getTweets);
+router.get("/", isAuth, tweetController.getTweets);
 
 // TODO: GET /tweets/:id
-router.get("/:id", tweetController.getTweet);
+router.get("/:id", isAuth, tweetController.getTweet);
 
 // TODO: POST /tweets
-router.post("/", validateTweet, tweetController.createTweet);
+router.post("/", isAuth, validateTweet, tweetController.createTweet);
 
 // TODO: PUT /tweets/:id
-router.put("/:id", validateTweet, tweetController.updateTweet);
+router.put("/:id", isAuth, validateTweet, tweetController.updateTweet);
 
 // TODO: DELETE /tweets/:id
-router.delete("/:id", tweetController.deleteTweet);
+router.delete("/:id", isAuth, tweetController.deleteTweet);
 
 export default router;

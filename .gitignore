@@ -16,6 +16,7 @@ package-lock.json
 
 # npm package
 *.tgz
+node_modules
 
 # OS or Editor folders
 .DS_Store

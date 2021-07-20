@@ -3,17 +3,19 @@ import cors from "cors";
 import morgan from "morgan";
 import helmet from "helmet";
 import "express-async-errors";
-import tweetRouter from "./router/tweet.js";
+import tweetsRouter from "./router/tweet.js";
+import authRouter from "./router/auth.js";
 
 const app = express();
 
 app.use(express.json()); // req.body 파싱
 app.use(helmet());
 app.use(cors());
-app.use(morgan("short"));
+app.use(morgan("tiny"));
 
 // Router
-app.use("/tweets", tweetRouter);
+app.use("/tweets", tweetsRouter);
+app.use("/auth", authRouter);
 
 // Not Found
 app.use((req, res, next) => {

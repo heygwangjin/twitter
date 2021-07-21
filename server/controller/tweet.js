@@ -1,5 +1,6 @@
 //* Controller (Model에 데이터 읽고 씀)
 //* Logic 처리
+import { getSocketIO } from "../connection/socket.js";
 import * as tweetRepository from "../data/tweet.js";
 
 // next는 사용하지 않으면 생략
@@ -23,6 +24,7 @@ export async function createTweet(req, res) {
   const { text } = req.body;
   const tweet = await tweetRepository.create(text, req.userId);
   res.status(201).json(tweet);
+  getSocketIO().emit("tweets", tweet);
 }
 
 export async function updateTweet(req, res) {

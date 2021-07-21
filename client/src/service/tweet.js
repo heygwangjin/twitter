@@ -1,7 +1,8 @@
 export default class TweetService {
-  constructor(http, tokenStorage) {
+  constructor(http, tokenStorage, socket) {
     this.http = http;
     this.tokenStorage = tokenStorage;
+    this.socket = socket;
   }
 
   // Problem : 함수마다 headers나 받아 온 데이터 json 변환 같은 중복되는 코드가 있어서 각 함수별로 기능이 한 눈에 보이지 않는다.
@@ -42,5 +43,9 @@ export default class TweetService {
     return {
       Authorization: `Bearer ${token}`,
     };
+  }
+
+  onSync(callback) {
+    return this.socket.onSync("tweets", callback);
   }
 }

@@ -28,7 +28,6 @@ const validateSignup = [
     .normalizeEmail()
     .withMessage("유효하지 않은 이메일입니다."),
   body("url")
-    .trim()
     .isURL()
     .withMessage("유효하지 않은 URL 입니다.")
     .optional({ nullable: true, checkFalsy: true }),

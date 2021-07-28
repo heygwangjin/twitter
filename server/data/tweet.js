@@ -1,45 +1,86 @@
 //* Model (DATA)
 //* Only Store, Read and Write Data (Controller의 요청에 따라)
-import { db } from "../db/database.js";
+import SQ from "sequelize";
+import { sequelize } from "../db/database.js";
+import { User } from "./auth.js";
+const DataTypes = SQ.DataTypes;
+const Sequelize = SQ.Sequelize;
 
-const SELECT_JOIN =
-  "SELECT t.id, t.text, t.createdAT, t.userId, u.username, u.name, u.url FROM tweets as t JOIN users as u ON t.userId = u.id";
-const ORDER_DESC = "ORDER BY t.createdAT DESC";
+const Tweet = sequelize.define("tweet", {
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    allowNull: false,
+    primaryKey: true,
+  },
+  text: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+  },
+});
+Tweet.belongsTo(User); // foreign key 생성
+
+const INCLUDE_USER = {
+  attributes: [
+    "id",
+    "text",
+    "createdAt",
+    "userId",
+    [Sequelize.col("user.name"), "name"],
+    [Sequelize.col("user.username"), "username"],
+    [Sequelize.col("user.url"), "url"],
+  ],
+  include: {
+    model: User,
+    attributes: [],
+  },
+};
+
+const ORDER_DESC = {
+  order: [["createdAt", "DESC"]],
+};
 
 export async function getAll() {
-  return db
-    .execute(`${SELECT_JOIN} ${ORDER_DESC}`) //
-    .then((result) => result[0]);
+  return Tweet.findAll({
+    ...INCLUDE_USER,
+    ...ORDER_DESC,
+  });
 }
 
 export async function getAllByUsername(username) {
-  return db
-    .execute(`${SELECT_JOIN} WHERE username=? ${ORDER_DESC}`, [username]) //
-    .then((result) => result[0]);
+  return Tweet.findAll({
+    ...INCLUDE_USER,
+    ...ORDER_DESC,
+    include: {
+      ...INCLUDE_USER.include,
+      where: { username },
+    },
+  });
 }
 
 export async function getById(id) {
-  return db
-    .execute(`${SELECT_JOIN} WHERE t.id=?`, [id]) //
-    .then((result) => result[0][0]);
+  return Tweet.findOne({
+    where: { id },
+    ...INCLUDE_USER,
+  });
 }
 
 export async function create(text, userId) {
-  return db
-    .execute("INSERT INTO tweets (text, createdAt, userId) VALUES(?,?,?)", [
-      text,
-      new Date(),
-      userId,
-    ])
-    .then((result) => getById(result[0].insertId)); // tweet id에 알맞은 트윗의 전체 정보
+  return Tweet.create({ text, userId }) //
+    .then((data) => this.getById(data.dataValues.id));
 }
 
 export async function update(id, text) {
-  return db
-    .execute("UPDATE tweets SET text=? WHERE id=?", [text, id])
-    .then(() => getById(id));
+  return Tweet.findByPk(id, INCLUDE_USER) //
+    .then((tweet) => {
+      tweet.text = text;
+      return tweet.save();
+    });
 }
 
 export async function remove(id) {
-  return db.execute("DELETE FROM tweets WHERE id=?", [id]);
+  return Tweet.findByPk(id) //
+    .then((tweet) => {
+      tweet.destroy();
+    });
 }

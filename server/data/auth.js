@@ -1,25 +1,48 @@
-import { db } from "../db/database.js";
+//* 사용자 데이터 모델 정의 필요
+import SQ from "sequelize";
+import { sequelize } from "../db/database.js";
+const DataTypes = SQ.DataTypes;
+
+export const User = sequelize.define(
+  "user",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      allowNull: false,
+      primaryKey: true,
+    },
+    username: {
+      type: DataTypes.STRING(45),
+      allowNull: false,
+    },
+    password: {
+      type: DataTypes.STRING(128),
+      allowNull: false,
+    },
+    name: {
+      type: DataTypes.STRING(128),
+      allowNull: false,
+    },
+    email: {
+      type: DataTypes.STRING(128),
+      allowNull: false,
+    },
+    url: DataTypes.TEXT,
+  },
+  { timestamps: false }
+);
 
 export async function findByUsername(username) {
-  return db
-    .execute("SELECT * FROM users WHERE username=?", [username])
-    .then((result) => result[0][0]);
+  return User.findOne({ where: { username } });
 }
 
 export async function findById(id) {
-  return db
-    .execute("SELECT * FROM users WHERE id=?", [id])
-    .then((result) => result[0][0]);
+  return User.findByPk(id);
 }
 
 export async function createUser(user) {
-  const { username, password, name, email, url } = user;
-  return db
-    .execute(
-      "INSERT INTO users (username, password, name, email, url) VALUES (?,?,?,?,?)",
-      [username, password, name, email, url]
-    )
-    .then((result) => {
-      return result[0].inserId;
-    });
+  return User.create(user).then((data) => {
+    return data.dataValues.id;
+  });
 }
